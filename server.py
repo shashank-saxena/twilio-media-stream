@@ -8,13 +8,14 @@ from twilio.twiml.voice_response import VoiceResponse
 from twilio.rest import Client
 import time
 import pdb
+import os
 
 current_time_ms = lambda: int(round(time.time() * 1000))
 
 import json
 import base64
 
-HTTP_SERVER_PORT = 8080
+HTTP_SERVER_PORT = int(os.environ.get("PORT", 8080))
 
 config = types.RecognitionConfig(
     encoding=enums.RecognitionConfig.AudioEncoding.MULAW,
@@ -153,6 +154,9 @@ def transcript(ws):
 
     bridge.terminate()
     print("WS connection closed")
+
+print("__name__")
+print(__name__)
 
 if __name__ == '__main__':
     from gevent import pywsgi

@@ -11,7 +11,7 @@ class SpeechClientBridge:
 
         client = speech.SpeechClient()
         responses = client.streaming_recognize(
-            streaming_config, 
+            streaming_config,
             self.get_requests()
         )
         self.process_responses(responses)
