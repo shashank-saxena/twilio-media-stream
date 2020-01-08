@@ -10,6 +10,8 @@ import time
 import pdb
 import os
 
+import xml.etree.ElementTree as ET
+
 current_time_ms = lambda: int(round(time.time() * 1000))
 
 import json
@@ -41,11 +43,15 @@ account_sid = ''
 auth_token = ''
 client = Client(account_sid, auth_token)
 
+current_stream_name = "initial_1"
+
 @app.route('/answer', methods=['POST'])
 def return_twiml():
     print("POST TwiML")
     # pdb.set_trace()
-    return render_template('streams.xml', host=(request.environ['HTTP_HOST']), timeout_sec=30)
+    global HOST
+    HOST = request.environ['HTTP_HOST']
+    return render_template('streams.xml', host=HOST, text='Hi, I am alice how can i help you?', name=current_stream_name, timeout_sec=30)
 
 # [START dialogflow_detect_intent_text]
 def detect_intent_texts(texts=[], language_code="en-US"):
@@ -59,6 +65,7 @@ def detect_intent_texts(texts=[], language_code="en-US"):
     session_id = streamSid
     session = session_client.session_path(project_id, session_id)
     print('Session path: {}\n'.format(session))
+    print(texts)
 
     for text in texts:
         text_input = dialogflow.types.TextInput(
@@ -78,9 +85,30 @@ def detect_intent_texts(texts=[], language_code="en-US"):
             response.query_result.fulfillment_text))
 
         if not (response.query_result.fulfillment_text is None):
-            resp = VoiceResponse()
-            resp.say(response.query_result.fulfillment_text, voice='alice')
-            call = client.calls(callSid).update(twiml=str(resp))
+            global current_stream_name
+            new_stream = current_stream_name + '1'
+            tree = ET.parse('./templates/streams.xml')
+            root = tree.getroot()
+            root[0].text = response.query_result.fulfillment_text
+            root[1][0].set("url", "wss://" + HOST)
+            root[1][0].set("name", new_stream)
+            root[2].set("length", "30")
+
+            stop = ET.Element("Stop")
+            stream = ET.Element("Stream")
+            stream.set("name", current_stream_name)
+            stop.append(stream)
+            root.insert(0, stop)
+
+            resp = ET.tostring(root, encoding="unicode")
+
+            # resp = VoiceResponse()
+            # resp.say(response.query_result.fulfillment_text, voice='alice')
+
+            # resp = render_template('streams.xml', host=HOST, text='Hi, I am alice how can i help you?', timeout_sec=30)
+            print(resp)
+            call = client.calls(callSid).update(twiml=resp)
+            current_stream_name = new_stream
 # [END dialogflow_detect_intent_text]
 
 def on_transcription_response(response):
@@ -106,17 +134,10 @@ def on_transcription_response(response):
 
     transcribeText.append(transcription)
 
-    if (current_time - startTime) > thresholdMS:
-        detect_intent_texts(transcribeText)
+    if result.is_final == True: # and (current_time - startTime) > thresholdMS:
+        detect_intent_texts([transcription])
         startTime = current_time
         transcribeText.clear()
-
-# @sockets.route('/web')
-# def webS(webSoc):
-#     print("web: WS connection opened")
-#
-#     while not webSoc.closed:
-#         message = webSoc.receive()
 
 @sockets.route('/')
 def transcript(ws):

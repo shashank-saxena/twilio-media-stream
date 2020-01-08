@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say>Hi, I am alice how can i help you?</Say>
+  <Say>{{text}}</Say>
   <Start>
-    <Stream url="wss://{{host}}/"></Stream>
+    <Stream name="{{name}}" url="wss://{{host}}/"></Stream>
   </Start>
   <Pause length="{{timeout_sec}}"/>
 </Response>
