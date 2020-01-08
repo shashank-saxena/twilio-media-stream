@@ -11,6 +11,9 @@ import pdb
 import os
 
 import xml.etree.ElementTree as ET
+from dotenv import load_dotenv
+
+load_dotenv()
 
 current_time_ms = lambda: int(round(time.time() * 1000))
 
@@ -38,9 +41,10 @@ callSid = None
 thresholdMS = 3000
 startTime = current_time_ms()
 transcribeText = []
+call_timeout_sec = "60"
 
-account_sid = ''
-auth_token = ''
+account_sid = os.getenv("TWILLIO_ACCOUNT_SID")
+auth_token = os.getenv("TWILLIO_AUTH_TOKEN")
 client = Client(account_sid, auth_token)
 
 current_stream_name = "initial_1"
@@ -51,7 +55,7 @@ def return_twiml():
     # pdb.set_trace()
     global HOST
     HOST = request.environ['HTTP_HOST']
-    return render_template('streams.xml', host=HOST, text='Hi, I am alice how can i help you?', name=current_stream_name, timeout_sec=30)
+    return render_template('streams.xml', host=HOST, text='Hi, I am alice how can i help you?', name=current_stream_name, timeout_sec=call_timeout_sec)
 
 # [START dialogflow_detect_intent_text]
 def detect_intent_texts(texts=[], language_code="en-US"):
@@ -92,7 +96,7 @@ def detect_intent_texts(texts=[], language_code="en-US"):
             root[0].text = response.query_result.fulfillment_text
             root[1][0].set("url", "wss://" + HOST)
             root[1][0].set("name", new_stream)
-            root[2].set("length", "30")
+            root[2].set("length", call_timeout_sec)
 
             stop = ET.Element("Stop")
             stream = ET.Element("Stream")

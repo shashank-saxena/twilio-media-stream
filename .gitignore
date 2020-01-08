@@ -105,3 +105,4 @@ venv.bak/
 
 google_creds.json
 env/*
+.env
