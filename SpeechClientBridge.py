@@ -3,6 +3,7 @@ from threading import Thread
 from google.cloud import speech
 from google.cloud.speech import types
 
+
 class SpeechClientBridge:
     def __init__(self, streaming_config, on_response):
         self._on_response = on_response
@@ -35,4 +36,4 @@ class SpeechClientBridge:
             self._on_response(response)
 
             if self._ended:
-              break;
+                break

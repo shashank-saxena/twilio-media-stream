@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Response>
-  <Say>{{text}}</Say>
+  <Say language="hi-IN">{{text}}</Say>
   <Start>
     <Stream name="{{name}}" url="wss://{{host}}/"></Stream>
   </Start>
