@@ -57,7 +57,7 @@ def return_twiml():
     # pdb.set_trace()
     global HOST
     HOST = request.environ['HTTP_HOST']
-    return render_template('streams.xml', host=HOST, text='नमस्ते, इफको टोक्यो जनरल इन्शुरन्स में कॉल करने के लिए धन्यवाद. यह कॉल क्वालिटी और ट्रेनिंग के लिए रिकॉर्ड की जाएगी. क्या आप इस से सहमत है', name=current_stream_name, timeout_sec=call_timeout_sec)
+    return render_template('streams.xml', host=HOST, text='नमस्ते, डेमो जनरल इन्शुरन्स में कॉल करने के लिए धन्यवाद. में जनरल इन्शुरन्स की और से एक वर्चुअल अस्सिटेंट बोल रही हूँ. यह कॉल क्वालिटी और ट्रेनिंग के लिए रिकॉर्ड की जाएगी. क्या आप इस से सहमत है', name=current_stream_name, timeout_sec=call_timeout_sec)
 
 
 # [START dialogflow_detect_intent_text]
